@@ -8,6 +8,8 @@ Assumption: Dealers order of magnitude would be near 10^2 or 10^3 and would not 
 
 We could start with a simple solution where we have a resource on our endpoint that is responsible for fetching the data source and returning a response containing all dealers. As the exercise requests, we need to store data locally and be careful with deleted items, since we need no specific feature of a NoSQL at this point we could start with a relation database and implement an upsert for fetched records. 
 
+I would create the application based on Sinatra (since we dont need to deal with views, models, authentication, mailing) and use PostgreSQL for our RDB.
+
 ![image](https://user-images.githubusercontent.com/400858/118904221-cf53c400-b8ef-11eb-8ad1-b9baac8e5b80.png)
 
 This would be our minimal architechture, in which I included a CDN (Cloudfront, Cloudflare) in front of our API and also our Asset storage (S3,GCS)
@@ -33,13 +35,17 @@ Now we have a fast and consistent endpoint, but we're not reliable nor scalable.
 
 There's another SPOF that is our Database single instance, we could introduce a cluster with reading replicas and failover&failback configurations, or even use a managed relational database service for easier configuration and maintenance (at a higher cost). But I think it's overkill for our scenario (max of 10^3 records) since we'd have a large cache window to replace this instance and manually fill cache.
 
+# Disclaimers
+
+Taking in consideration the requirementes of this exercise going for a NoSQL database seems arbitrary, but if we could assume that we will introduce a search input in the frontend app or dealer order of magnitude grows too much and demands a to fetch only visible dealers in the visible area of the map for example, then I would consider NoSQL alternatives (Discussed in the Alternatives section)
+
 # Conclusion
 
 For the proposed challenge (taking assumptions in consideration), a simple cache strategy seems to be best to architechture to start, avoiding over-engineering and keeping a low cost for resources and bandwidth.
 
 # Alternatives
 
-If we had more complex data sync scenarios I would suggest having a job/worker queue in a separate instance to handle synchronization (retriving records and upserting) but we would be consuming more computing services (EC2) for the workers instances and for the backend (Redis,SQS). In this situation I would also use some in memory cache between application and database to avoid load on database and reduce latency. For the presented scenario it seems overkill. 
+If we had more complex data sync scenarios I would suggest having a backgroun job queue (Sidekiq, Shoryuken) in a separate instance to handle synchronization (retriving records and upserting) but we would be consuming more computing services (EC2) for the workers instances and for the backend (Redis,SQS). In this situation I would also use some in memory cache between application and database to avoid load on database and reduce latency. For the presented scenario it seems overkill. 
 
 For the database we didn't have any specific necessity like high-write throuput, geo spatial queries, schema flexibilty that's why I haven't explored any **NoSQL** options. But if we try to assume that at some point geo-spatial queries would be needed or the dealers schema could evolve rapidly. We could think of a **mongodb** (document based) wich has geo-spatial queries or even **ElasticSesrch** that also bring a strong search engine on top of the geo-spatial query feature.
 
