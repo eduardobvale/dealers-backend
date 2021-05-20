@@ -44,5 +44,6 @@ If we had more complex data sync scenarios I would suggest having a job/worker q
 For the database we didn't have any specific necessity like high-write throuput, geo spatial queries, schema flexibilty that's why I haven't explored any **NoSQL** options. But if we try to assume that at some point geo-spatial queries would be needed or the dealers schema could evolve rapidly. We could think of a **mongodb** (document based) wich has geo-spatial queries or even **ElasticSesrch** that also bring a strong search engine on top of the geo-spatial query feature.
 
 ## Frontend
-
+[wip]
 For the frontend, we would need a framework to render our API response in visual components and interact with a map. For that we'll use React and MateriaUI as our design system and for our map we could use Leaflet (a widely known js interactive map library).
+
